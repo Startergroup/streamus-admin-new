@@ -1,0 +1,41 @@
+{
+  "name": "admin",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@morev/vue-transitions": "3.0.2",
+    "axios": "1.7.7",
+    "bcryptjs": "2.4.3",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "lodash": "4.17.21",
+    "primevue": "3.52.0",
+    "tailwindcss": "3.2.4",
+    "uuid": "8.3.2",
+    "vee-validate": "4.13.2",
+    "vue": "3.5.12",
+    "vue-final-modal": "4.5.0",
+    "vue-i18n": "10.0.4",
+    "vue-router": "4.0.3",
+    "vue-tippy": "6.4.4",
+    "vue-toastification": "2.0.0-rc.5",
+    "vuex": "4.1.0",
+    "yup": "1.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.1.4",
+    "autoprefixer": "10.4.13",
+    "eslint": "8.57.0",
+    "eslint-config-standard": "17.1.0",
+    "eslint-plugin-vue": "9.21.1",
+    "postcss": "8.4.31",
+    "postcss-loader": "7.0.1",
+    "sass": "1.32.7",
+    "vite": "5.4.10"
+  }
+}

@@ -1,0 +1,73 @@
+[data-tippy-root] {
+  pointer-events: all !important;
+}
+
+.tippy {
+  &-box {
+    border-radius: 5px;
+
+    &[data-theme~='orange'] {
+      background: var(--orange-color);
+      color: var(--white-color);
+
+      &[data-placement^='top'] > .tippy-arrow:before {
+        border-top-color: var(--orange-color);
+      }
+
+      &[data-placement^='bottom'] > .tippy-arrow:before {
+        border-bottom-color: var(--orange-color);
+      }
+
+      &[data-placement^='left'] > .tippy-arrow:before {
+        border-left-color: var(--orange-color);
+      }
+
+      &[data-placement^='right'] > .tippy-arrow:before {
+        border-right-color: var(--orange-color);
+      }
+    }
+
+    &[data-theme="green"] {
+      background: var(--green-color);
+      color: var(--white-color);
+    }
+
+    &[data-theme="gray"] {
+      background: var(--middle-gray-color);
+      color: var(--dark-gray-color);
+
+      &[data-placement^='top'] > .tippy-arrow:before {
+        border-top-color: var(--middle-gray-color);
+      }
+
+      &[data-placement^='bottom'] > .tippy-arrow:before {
+        border-bottom-color: var(--middle-gray-color);
+      }
+
+      &[data-placement^='left'] > .tippy-arrow:before {
+        border-left-color: var(--middle-gray-color);
+      }
+
+      &[data-placement^='right'] > .tippy-arrow:before {
+        border-right-color: var(--middle-gray-color);
+      }
+    }
+
+    &[data-theme="table"] {
+      background: #FFF;
+      border: 1px solid var(--middle-gray-color);
+
+      & > .tippy-arrow {
+        display: none;
+      }
+
+      & > .tippy-content {
+        padding: 0;
+      }
+    }
+  }
+
+  &-content {
+    padding: 12px;
+  }
+}

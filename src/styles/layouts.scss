@@ -1,0 +1,30 @@
+// Layouts для tailwind
+@layer components {
+  .tw-column {
+    &-start {
+      @apply tw-flex tw-flex-col tw-items-start;
+    }
+
+    &-center {
+      @apply tw-flex tw-flex-col tw-items-center;
+    }
+
+    &-end {
+      @apply tw-flex tw-flex-col tw-items-end;
+    }
+  }
+}
+
+.scrollbar-thin {
+  &::-webkit-scrollbar {
+    @apply tw-w-[2px];
+  }
+
+  &::-webkit-scrollbar-track {
+    @apply tw-rounded-[12px] tw-bg-ink/light;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @apply tw-rounded-[5px] tw-bg-primary/base;
+  }
+}
