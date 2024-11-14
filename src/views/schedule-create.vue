@@ -31,7 +31,7 @@
         <span class="tw-text-sm tw-font-medium tw-text-sky/white">День недели</span>
 
         <calendar
-          v-model="form.date.value"
+          :model-value="new Date(form.date.value)"
           :invalid="!form.date.value"
           :show-icon="true"
           :show-on-focus="true"
@@ -39,6 +39,7 @@
           icon-display="input"
           class="tw-w-[300px]"
           placeholder="12.01.2024"
+          @update:model-value="onUpdateDate($event, 'date')"
         />
       </div>
 
@@ -73,7 +74,7 @@
               </span>
 
               <calendar
-                v-model="item.start"
+                :model-value="new Date(item.start)"
                 :invalid="!item.start"
                 :show-icon="true"
                 :show-on-focus="true"
@@ -82,6 +83,7 @@
                 class="tw-w-full"
                 icon-display="input"
                 placeholder="14:00"
+                @update:model-value="onUpdateTime($event, 'start', index)"
               />
             </div>
 
@@ -91,7 +93,7 @@
               </span>
 
               <calendar
-                v-model="item.end"
+                :model-value="new Date(item.end)"
                 :invalid="!item.end"
                 :show-icon="true"
                 :show-on-focus="true"
@@ -100,6 +102,7 @@
                 class="tw-w-full"
                 icon-display="input"
                 placeholder="14:00"
+                @update:model-value="onUpdateTime($event, 'end', index)"
               />
             </div>
           </div>
@@ -113,7 +116,6 @@
               <input-text
                 v-model="item.fio"
                 :pt="inputPt"
-                :invalid="!item.fio.length"
                 placeholder="Иванов Иван"
                 class="tw-bg-ink/darker tw-w-full"
               />
@@ -127,7 +129,6 @@
               <input-text
                 v-model="item.company"
                 :pt="inputPt"
-                :invalid="!item.company.length"
                 placeholder="Рога и копыта"
                 class="tw-bg-ink/darker tw-w-full"
               />
@@ -143,7 +144,6 @@
               <input-text
                 v-model="item.city"
                 :pt="inputPt"
-                :invalid="!item.city.length"
                 placeholder="Москва"
                 class="tw-bg-ink/darker tw-w-full"
               />
@@ -177,6 +177,7 @@ import InputText from 'primevue/inputtext'
 import * as yup from 'yup'
 import { inputPt } from '@/pt-options'
 import { getForm } from '@/composables/form.composables'
+import { useStore } from 'vuex'
 
 export default {
   name: 'schedule-create',
@@ -186,13 +187,15 @@ export default {
     InputText
   },
   setup () {
+    const store = useStore()
+
     const lectureSchema = yup.object({
       name: yup.string().required(),
-      start: yup.date().required(),
-      end: yup.date().required(),
-      fio: yup.string().required(),
-      company: yup.string().required(),
-      city: yup.string().required(),
+      start: yup.number().required(),
+      end: yup.number().required(),
+      fio: yup.string(),
+      company: yup.string(),
+      city: yup.string(),
       section: yup.string()
     })
     const { form, errors, handleSubmit, meta } = getForm({
@@ -208,11 +211,12 @@ export default {
         }
       ],
       initialValues: {
+        date: Date.now(),
         lectures: [
           {
             name: '',
-            start: null,
-            end: null,
+            start: Date.now(),
+            end: Date.now(),
             fio: '',
             company: '',
             city: '',
@@ -225,8 +229,8 @@ export default {
         lectures: yup.array().of(lectureSchema).min(1)
       })
     })
-    const onSubmit = handleSubmit((values) => {
-      console.debug(values)
+    const onSubmit = handleSubmit(async (values) => {
+      await store.dispatch('schedule/createSchedule', values)
     })
 
     const appendLecture = () => {
@@ -242,6 +246,13 @@ export default {
     }
     const removeLecture = (index) => {
       form.value.lectures.value.splice(index, 1)
+    }
+
+    const onUpdateDate = (date, property) => {
+      form.value[property].value = date.getTime()
+    }
+    const onUpdateTime = (date, property, index) => {
+      form.value.lectures.value[index][property] = date.getTime()
     }
 
     const calendarPt = {
@@ -262,6 +273,8 @@ export default {
       form,
       inputPt,
       onSubmit,
+      onUpdateDate,
+      onUpdateTime,
       removeLecture,
       meta
     }
