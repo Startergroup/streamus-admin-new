@@ -14,16 +14,103 @@
         </template>
       </router-link>
     </div>
+
+    <data-table
+      :value="schedules"
+      :pt="tablePt"
+      :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      paginator
+      class="tw-w-full"
+    >
+      <column
+        v-for="(item, index) in columns"
+        :key="index"
+        :field="item.field"
+        :header="item.header"
+      >
+        <template #body="{ data, field }">
+          <span v-if="field === 'schedule_id'">
+            {{ data[field] }}
+          </span>
+
+          <span v-if="field === 'date'">
+            {{ moment(data[field]).format('DD.MM.YYYY') }}
+          </span>
+
+          <span v-if="field === 'lectures'">
+            {{ data.lectures.length }}
+          </span>
+
+          <div
+            v-if="field === 'actions'"
+            class="tw-flex tw-items tw-justify-end tw-w-full tw-gap-3"
+          >
+            <router-link :to="{ name: 'schedule-edit', params: { id: data.schedule_id } }">
+              <template #default>
+                <button-prime
+                  outlined
+                  label="Редактировать"
+                />
+              </template>
+            </router-link>
+
+            <button-prime
+              outlined
+              label="Удалить"
+              @click="onDelete(data.schedule_id)"
+            />
+          </div>
+        </template>
+      </column>
+    </data-table>
   </div>
 </template>
 
 <script>
 import ButtonPrime from 'primevue/button'
+import Column from 'primevue/column'
+import DataTable from 'primevue/datatable'
+
+import moment from 'moment'
+import { tablePt } from '@/pt-options'
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   name: 'schedule',
   components: {
-    ButtonPrime
+    ButtonPrime,
+    Column,
+    DataTable
+  },
+  setup () {
+    const store = useStore()
+
+    const schedules = computed(() => store.state.schedule.schedules)
+    const columns = [
+      { field: 'schedule_id', header: 'ID' },
+      { field: 'date', header: 'Дата' },
+      { field: 'lectures', header: 'Кол-во доклодов' },
+      { field: 'actions', header: '' }
+    ]
+
+    onMounted(async () => {
+      await store.dispatch('schedule/getSchedules')
+    })
+
+    const onDelete = async (id) => {
+      await store.dispatch('schedule/deleteSchedule', id)
+      await store.dispatch('schedule/getSchedules')
+    }
+
+    return {
+      columns,
+      moment,
+      onDelete,
+      schedules,
+      tablePt
+    }
   }
 }
 </script>

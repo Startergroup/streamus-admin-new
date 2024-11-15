@@ -1,5 +1,6 @@
 <template>
   <form
+    v-if="isEditMode && Object.keys(schedule).length || !isEditMode"
     class="tw-column-start tw-w-full tw-gap-12"
     @submit.prevent="onSubmit"
   >
@@ -31,7 +32,7 @@
         <span class="tw-text-sm tw-font-medium tw-text-sky/white">День недели</span>
 
         <calendar
-          :model-value="new Date(form.date.value)"
+          :model-value="form.date.value"
           :invalid="!form.date.value"
           :show-icon="true"
           :show-on-focus="true"
@@ -64,7 +65,7 @@
             outlined
             label="Удалить"
             class="tw-ml-auto"
-            @click="removeLecture(index)"
+            @click="removeLecture(index, item.lecture_id)"
           />
 
           <div class="tw-column-start tw-w-[300px] tw-gap-6">
@@ -175,9 +176,13 @@ import Calendar from 'primevue/calendar'
 import InputText from 'primevue/inputtext'
 
 import * as yup from 'yup'
+import moment from 'moment'
+import momentTimezone from 'moment-timezone'
 import { inputPt } from '@/pt-options'
 import { getForm } from '@/composables/form.composables'
 import { useStore } from 'vuex'
+import { computed, onBeforeMount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 export default {
   name: 'schedule-create',
@@ -188,15 +193,20 @@ export default {
   },
   setup () {
     const store = useStore()
+    const route = useRoute()
+    const router = useRouter()
+
+    const isEditMode = computed(() => Boolean(route.params.id))
+    const schedule = computed(() => store.state.schedule.schedule)
 
     const lectureSchema = yup.object({
       name: yup.string().required(),
-      start: yup.number().required(),
-      end: yup.number().required(),
+      start: yup.date().required(),
+      end: yup.date().required(),
       fio: yup.string(),
       company: yup.string(),
       city: yup.string(),
-      section: yup.string()
+      section_name: yup.string()
     })
     const { form, errors, handleSubmit, meta } = getForm({
       items: [
@@ -211,26 +221,36 @@ export default {
         }
       ],
       initialValues: {
-        date: Date.now(),
+        date: new Date(),
         lectures: [
           {
             name: '',
-            start: Date.now(),
-            end: Date.now(),
+            start: new Date(),
+            end: new Date(),
             fio: '',
             company: '',
             city: '',
-            section: ''
+            section_name: 'qwe',
+            section_id: 0
           }
         ]
       },
       validationSchema: yup.object().shape({
-        date: yup.string().required(),
+        date: yup.date().required(),
         lectures: yup.array().of(lectureSchema).min(1)
       })
     })
     const onSubmit = handleSubmit(async (values) => {
-      await store.dispatch('schedule/createSchedule', values)
+      if (isEditMode.value) {
+        await store.dispatch('schedule/updateSchedule', {
+          ...values,
+          schedule_id: route.params.id
+        })
+      } else {
+        await store.dispatch('schedule/createSchedule', values)
+      }
+
+      await router.push({ name: 'schedules' })
     })
 
     const appendLecture = () => {
@@ -241,18 +261,24 @@ export default {
         fio: '',
         company: '',
         city: '',
-        section: ''
+        section_id: 0,
+        section_name: '123'
       })
     }
-    const removeLecture = (index) => {
+    const removeLecture = async (index, id) => {
+      if (isEditMode.value) {
+        await store.dispatch('schedule/deleteLecture', id)
+      }
+
       form.value.lectures.value.splice(index, 1)
     }
 
     const onUpdateDate = (date, property) => {
-      form.value[property].value = date.getTime()
+      form.value[property].value = date
     }
     const onUpdateTime = (date, property, index) => {
-      form.value.lectures.value[index][property] = date.getTime()
+      const timezone = momentTimezone.tz.guess()
+      form.value.lectures.value[index][property] = momentTimezone.tz(date, timezone).toISOString()
     }
 
     const calendarPt = {
@@ -266,17 +292,29 @@ export default {
       }
     }
 
+    onBeforeMount(async () => {
+      if (isEditMode.value) {
+        await store.dispatch('schedule/getScheduleById', route.params.id)
+
+        form.value.date.value = schedule.value.date
+        form.value.lectures.value = schedule.value.lectures
+      }
+    })
+
     return {
       appendLecture,
       calendarPt,
       errors,
       form,
       inputPt,
+      isEditMode,
+      meta,
+      moment,
       onSubmit,
       onUpdateDate,
       onUpdateTime,
       removeLecture,
-      meta
+      schedule
     }
   }
 }

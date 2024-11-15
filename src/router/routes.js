@@ -40,6 +40,14 @@ export default [
     }
   },
   {
+    name: 'schedule-edit',
+    path: '/schedule-edit/:id',
+    component: scheduleCreate,
+    meta: {
+      isProtected: true
+    }
+  },
+  {
     name: 'schedules',
     component: schedules,
     path: '/schedules',
