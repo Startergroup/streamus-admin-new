@@ -10,10 +10,10 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.SSH_PRIVATE_PROD }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.HOST_PROD }} > ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} > ~/.ssh/known_hosts
 
       - name: connect, pull and build
-        run: ssh ${{ secrets.USER_PROD }}@${{ secrets.HOST_PROD }} "cd ${{ secrets.WORKDIR_PROD }} && git checkout master && git pull && npm i && npm run build && exit"
+        run: ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd ${{ secrets.PROD_WORKDIR }} && git checkout master && git pull && npm i && npm run build && exit"
 
       - name: cleanup
         run: rm -rf ~/.ssh
