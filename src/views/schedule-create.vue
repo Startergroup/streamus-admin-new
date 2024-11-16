@@ -28,20 +28,36 @@
     </div>
 
     <div class="tw-column-start tw-w-full tw-gap-12">
-      <div class="tw-column-start tw-w-auto tw-gap-1">
-        <span class="tw-text-sm tw-font-medium tw-text-sky/white">День недели</span>
+      <div class="tw-flex tw-items-start tw-w-full tw-gap-6">
+        <div class="tw-column-start tw-w-auto tw-gap-1">
+          <span class="tw-text-sm tw-font-medium tw-text-sky/white">День недели</span>
 
-        <calendar
-          :model-value="form.date.value"
-          :invalid="!form.date.value"
-          :show-icon="true"
-          :show-on-focus="true"
-          :pt="calendarPt"
-          icon-display="input"
-          class="tw-w-[300px]"
-          placeholder="12.01.2024"
-          @update:model-value="onUpdateDate($event, 'date')"
-        />
+          <calendar
+            :model-value="form.date.value"
+            :invalid="!form.date.value"
+            :show-icon="true"
+            :show-on-focus="true"
+            :pt="calendarPt"
+            date-format="dd.mm.yy"
+            icon-display="input"
+            class="tw-w-[300px]"
+            placeholder="12.01.2024"
+            @update:model-value="onUpdateDate($event, 'date')"
+          />
+        </div>
+
+        <div class="tw-column-start tw-w-auto tw-gap-1">
+          <span class="tw-text-sm tw-font-medium tw-text-sky/white">Секция</span>
+
+          <select-button
+            v-model="form.section.value"
+            :invalid="Object.hasOwn(errors, form.section.name)"
+            :options="tabs"
+            :option-value="null"
+            option-label="section_name"
+            :pt="selectButtonPt"
+          />
+        </div>
       </div>
 
       <div class="tw-column-start tw-w-full tw-gap-6">
@@ -174,6 +190,7 @@
 import ButtonPrime from 'primevue/button'
 import Calendar from 'primevue/calendar'
 import InputText from 'primevue/inputtext'
+import SelectButton from 'primevue/selectbutton'
 
 import * as yup from 'yup'
 import moment from 'moment'
@@ -189,7 +206,8 @@ export default {
   components: {
     ButtonPrime,
     Calendar,
-    InputText
+    InputText,
+    SelectButton
   },
   setup () {
     const store = useStore()
@@ -199,28 +217,30 @@ export default {
     const isEditMode = computed(() => Boolean(route.params.id))
     const schedule = computed(() => store.state.schedule.schedule)
 
+    const tabs = computed(() => store.state.tabs.tabs.map(item => ({ section_name: item.name, section_id: item.tab_id })))
+
     const lectureSchema = yup.object({
       name: yup.string().required(),
       start: yup.date().required(),
       end: yup.date().required(),
       fio: yup.string(),
       company: yup.string(),
-      city: yup.string(),
-      section_name: yup.string()
+      city: yup.string()
     })
     const { form, errors, handleSubmit, meta } = getForm({
       items: [
         {
-          name: 'date',
-          props: {
-            label: 'Дата проведения докладов'
-          }
+          name: 'section'
+        },
+        {
+          name: 'date'
         },
         {
           name: 'lectures'
         }
       ],
       initialValues: {
+        section: null,
         date: new Date(),
         lectures: [
           {
@@ -236,6 +256,10 @@ export default {
         ]
       },
       validationSchema: yup.object().shape({
+        section: yup.object().shape({
+          section_name: yup.string().required(),
+          section_id: yup.number().required()
+        }),
         date: yup.date().required(),
         lectures: yup.array().of(lectureSchema).min(1)
       })
@@ -260,9 +284,7 @@ export default {
         end: null,
         fio: '',
         company: '',
-        city: '',
-        section_id: 0,
-        section_name: '123'
+        city: ''
       })
     }
     const removeLecture = async (index, id) => {
@@ -291,6 +313,13 @@ export default {
         }
       }
     }
+    const selectButtonPt = {
+      button: ({ context }) => {
+        return {
+          class: ['tw-bg-ink/darker', { 'before:tw-bg-primary/base': context.active }]
+        }
+      }
+    }
 
     onBeforeMount(async () => {
       if (isEditMode.value) {
@@ -298,7 +327,13 @@ export default {
 
         form.value.date.value = schedule.value.date
         form.value.lectures.value = schedule.value.lectures
+        form.value.section.value = {
+          section_id: schedule.value.section_id,
+          section_name: schedule.value.section_name
+        }
       }
+
+      await store.dispatch('tabs/getTabs')
     })
 
     return {
@@ -314,7 +349,9 @@ export default {
       onUpdateDate,
       onUpdateTime,
       removeLecture,
-      schedule
+      schedule,
+      selectButtonPt,
+      tabs
     }
   }
 }

@@ -8,7 +8,7 @@ export default {
     schedules: []
   },
   actions: {
-    async createSchedule ({ state }, { date = null, lectures = [] }) {
+    async createSchedule ({ state }, { date = null, section: { section_name, section_id, }, lectures = [] }) {
       if (!(date && lectures.length)) {
         return
       }
@@ -16,6 +16,8 @@ export default {
       await Api.post(`${API_VERSION}/schedule`, {
         data: {
           date,
+          section_name,
+          section_id,
           lectures
         }
       })
@@ -45,11 +47,13 @@ export default {
       const { schedules = [] } = await Api.get(`${API_VERSION}/schedules`) || {}
       state.schedules = schedules
     },
-    async updateSchedule ({ state }, { schedule_id = null, date = null, lectures = null }) {
+    async updateSchedule ({ state }, { schedule_id = null, date = null, section: { section_name, section_id, }, lectures = null }) {
       await Api.put(`${API_VERSION}/schedule`, {
         data: {
           schedule_id,
           date,
+          section_name,
+          section_id,
           lectures
         }
       })

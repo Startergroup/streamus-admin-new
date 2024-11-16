@@ -34,16 +34,16 @@
             {{ data[field] }}
           </span>
 
-          <span v-if="field === 'date'">
+          <span v-else-if="field === 'date'">
             {{ moment(data[field]).format('DD.MM.YYYY') }}
           </span>
 
-          <span v-if="field === 'lectures'">
+          <span v-else-if="field === 'lectures'">
             {{ data.lectures.length }}
           </span>
 
           <div
-            v-if="field === 'actions'"
+            v-else-if="field === 'actions'"
             class="tw-flex tw-items tw-justify-end tw-w-full tw-gap-3"
           >
             <router-link :to="{ name: 'schedule-edit', params: { id: data.schedule_id } }">
@@ -61,6 +61,8 @@
               @click="onDelete(data.schedule_id)"
             />
           </div>
+
+          <span v-else>{{ data[field] }}</span>
         </template>
       </column>
     </data-table>
@@ -91,6 +93,7 @@ export default {
     const columns = [
       { field: 'schedule_id', header: 'ID' },
       { field: 'date', header: 'Дата' },
+      { field: 'section_name', header: 'Секция' },
       { field: 'lectures', header: 'Кол-во доклодов' },
       { field: 'actions', header: '' }
     ]
