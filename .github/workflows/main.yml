@@ -1,0 +1,19 @@
+on: workflow_dispatch
+
+jobs:
+  run_pull:
+    name: run pull
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: install ssh keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.PROD_SSH_PRIVATE }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.PROD_HOST }} > ~/.ssh/known_hosts
+
+      - name: connect, pull and build
+        run: ssh ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} "cd ${{ secrets.PROD_WORKDIR }} && git checkout master && git pull && npm i && npm run build && exit"
+
+      - name: cleanup
+        run: rm -rf ~/.ssh
