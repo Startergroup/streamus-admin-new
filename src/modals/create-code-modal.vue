@@ -67,7 +67,7 @@
 <script>
 import ButtonPrime from 'primevue/button'
 import IconBase from '@/components/icon-base.vue'
-import InputText from 'primevue/inputnumber'
+import InputText from 'primevue/inputtext'
 import { VueFinalModal } from 'vue-final-modal'
 
 import icons from '@/utils/icons'

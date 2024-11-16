@@ -13,6 +13,9 @@ export default {
         data: { name, url, order }
       })
     },
+    async getTabs ({ state }) {
+      state.tabs = await Api.get(`${API_VERSION}/tabs`, {}).then(res => res.data) || {}
+    },
     async removeTab ({ state }, id) {
       await Api.delete(`${API_VERSION}/tab`, {
         data: {
@@ -20,8 +23,16 @@ export default {
         }
       })
     },
-    async getTabs ({ state }) {
-      state.tabs = await Api.get(`${API_VERSION}/tabs`, {}).then(res => res.data) || {}
+    async updateTab ({ state }, { tab_id, name, url, order, schedule = '' }) {
+      await Api.put(`${API_VERSION}/tab`, {
+        data: {
+          tab_id,
+          name,
+          order,
+          schedule,
+          url
+        }
+      })
     }
   }
 }

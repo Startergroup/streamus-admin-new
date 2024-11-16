@@ -12,5 +12,17 @@ export default {
       const { data = null } = await Api.get(`${API_VERSION}/settings`) || {}
       state.settings = data
     },
+    async updateSettings ({ state }, { title_ru, subtitle_ru, title_en, subtitle_en, favicon = '' }) {
+      await Api.put(`${API_VERSION}/settings`, {
+        data: {
+          settings_id: state.settings.settings_id,
+          title_ru,
+          subtitle_ru,
+          title_en,
+          subtitle_en,
+          favicon
+        }
+      })
+    }
   }
 }

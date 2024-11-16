@@ -12,7 +12,7 @@
         @submit.prevent="onSubmit"
       >
         <h2 class="tw-text-xl tw-font-medium tw-text-sky/white">
-          Добавление секции
+          Редактирование секции
         </h2>
 
         <div class="tw-column-start tw-items-center tw-w-full tw-gap-4">
@@ -70,9 +70,10 @@ import IconBase from '@/components/icon-base.vue'
 import InputText from 'primevue/inputtext'
 import { VueFinalModal } from 'vue-final-modal'
 
-import icons from '@/utils/icons'
 import * as yup from 'yup'
+import icons from '@/utils/icons'
 import { getForm } from '@/composables/form.composables'
+import { toRefs } from 'vue'
 
 export default {
   name: 'create-tab-modal',
@@ -83,15 +84,29 @@ export default {
     VueFinalModal
   },
   props: {
-    onCreateTab: {
+    name: {
+      type: String,
+      required: true
+    },
+    onEditTab: {
       type: Function,
       default: () => {
         console.debug('No event handler')
       }
+    },
+    order: {
+      type: Number,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
     }
   },
   emits: ['update:model-value'],
   setup (props, { emit }) {
+    const { name, order, url } = toRefs(props)
+
     const { form, errors, handleSubmit } = getForm({
       items: [
         {
@@ -101,19 +116,23 @@ export default {
           }
         },
         {
-          name: 'url',
-          props: {
-            placeholder: 'Ссылка на трансляцию'
-          }
-        },
-        {
           name: 'order',
           props: {
             placeholder: 'Порядок секции'
           }
+        },
+        {
+          name: 'url',
+          props: {
+            placeholder: 'Ссылка на трансляцию'
+          }
         }
       ],
-      initialValues: {},
+      initialValues: {
+        name: name.value,
+        order: order.value,
+        url: url.value
+      },
       validationSchema: yup.object().shape({
         name: yup.string().required('Это обязательное поле'),
         url: yup.string().required('Это обязательное поле'),
@@ -121,7 +140,7 @@ export default {
       })
     })
     const onSubmit = handleSubmit(async ({ name, url, order }) => {
-      await props.onCreateTab({ name, url, order })
+      await props.onEditTab({ name, url, order })
       emit('update:model-value', false)
     })
 
