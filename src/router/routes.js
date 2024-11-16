@@ -8,6 +8,10 @@ import vote from '@/views/vote.vue'
 
 export default [
   {
+    path: '/',
+    redirect: { name: 'codes' },
+  },
+  {
     name: 'auth',
     component: auth,
     path: '/auth',
