@@ -93,6 +93,7 @@ import IconBase from '@/components/icon-base.vue'
 import InputText from 'primevue/inputtext'
 
 import GenerateXlsx from '@/utils/generate-xlsx'
+import dayjs from 'dayjs'
 import icons from '@/utils/icons'
 import { tablePt } from '@/pt-options'
 import { inputPt } from '@/pt-options'
@@ -194,7 +195,7 @@ export default {
         const mappedItems = codes.value.map(item => {
           return {
             ...item,
-            last_activity: item.last_activity ? getFormattedDate(item.last_activity) : 'Не заходил'
+            last_activity: item.last_activity ? dayjs(item.last_activity).format('DD.MM.YYYY HH:mm') : 'Не заходил'
           }
         })
         const xlsx = new GenerateXlsx(columns, mappedItems)
