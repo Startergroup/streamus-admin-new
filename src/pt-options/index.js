@@ -1,3 +1,14 @@
+export const checkboxPt = {
+  box: ({ props }) => {
+    return {
+      class: [
+        '[&_path]:tw-fill-white',
+        { 'tw-bg-ink/darker': !props.modelValue },
+        { 'tw-bg-primary/base': props.modelValue }
+      ]
+    }
+  }
+}
 export const inputPt =  {
   root: ({ props }) => {
     return {

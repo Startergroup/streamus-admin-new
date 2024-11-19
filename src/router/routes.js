@@ -4,7 +4,6 @@ import quizzes from '@/views/quizzes.vue'
 import scheduleCreate from '@/views/schedule-create.vue'
 import schedules from '@/views/schedules.vue'
 import translation from '@/views/translation.vue'
-import vote from '@/views/vote.vue'
 
 export default [
   {
@@ -66,13 +65,5 @@ export default [
     meta: {
       isProtected: true
     }
-  },
-  {
-    name: 'vote',
-    component: vote,
-    path: '/vote',
-    meta: {
-      isProtected: true
-    }
-  },
+  }
 ]

@@ -46,6 +46,12 @@
             v-else-if="field === 'actions'"
             class="tw-flex tw-items tw-justify-end tw-w-full tw-gap-3"
           >
+            <button-prime
+              label="Отчет по голосованию"
+              outlined
+              @click="onGenerateVoteReport(data.schedule_id)"
+            />
+
             <router-link :to="{ name: 'schedule-edit', params: { id: data.schedule_id } }">
               <template #default>
                 <button-prime
@@ -106,11 +112,15 @@ export default {
       await store.dispatch('schedule/deleteSchedule', id)
       await store.dispatch('schedule/getSchedules')
     }
+    const onGenerateVoteReport = async (scheduleId) => {
+      await store.dispatch('schedule/getVoteReport', scheduleId)
+    }
 
     return {
       columns,
       moment,
       onDelete,
+      onGenerateVoteReport,
       schedules,
       tablePt
     }

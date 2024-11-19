@@ -54,10 +54,6 @@ export default {
         url: '/translation'
       },
       {
-        text: 'Голосования',
-        url: '/vote'
-      },
-      {
         text: 'Расписания',
         url: '/schedules'
       }

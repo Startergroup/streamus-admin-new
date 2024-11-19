@@ -84,8 +84,8 @@
             @click="removeLecture(index, item.lecture_id)"
           />
 
-          <div class="tw-column-start tw-w-[300px] tw-gap-6">
-            <div class="tw-column-start tw-w-full tw-gap-2">
+          <div class="tw-flex tw-items-end tw-justify-start tw-w-full tw-gap-4">
+            <div class="tw-column-start tw-w-[300px] tw-gap-2">
               <span class="tw-text-sm tw-font-medium tw-text-sky/white">
                 Начало доклада
               </span>
@@ -104,7 +104,7 @@
               />
             </div>
 
-            <div class="tw-column-start tw-w-full tw-gap-2">
+            <div class="tw-column-start tw-w-[300px] tw-gap-2">
               <span class="tw-text-sm tw-font-medium tw-text-sky/white">
                 Конец доклада
               </span>
@@ -122,6 +122,16 @@
                 @update:model-value="onUpdateTime($event, 'end', index)"
               />
             </div>
+
+            <label class="tw-flex tw-items-center tw-gap-2 tw-h-10">
+              <checkbox
+                v-model="item.is_votable"
+                :binary="true"
+                :pt="checkboxPt"
+              />
+
+              <span class="tw-text-base tw-font-medium tw-text-sky/white">Можно проголосовать</span>
+            </label>
           </div>
 
           <div class="tw-grid tw-grid-cols-2 tw-w-full tw-gap-6">
@@ -189,13 +199,14 @@
 <script>
 import ButtonPrime from 'primevue/button'
 import Calendar from 'primevue/calendar'
+import Checkbox from 'primevue/checkbox'
 import InputText from 'primevue/inputtext'
 import SelectButton from 'primevue/selectbutton'
 
 import * as yup from 'yup'
 import moment from 'moment'
 import momentTimezone from 'moment-timezone'
-import { inputPt } from '@/pt-options'
+import { checkboxPt, inputPt } from '@/pt-options'
 import { getForm } from '@/composables/form.composables'
 import { useStore } from 'vuex'
 import { computed, onBeforeMount } from 'vue'
@@ -206,6 +217,7 @@ export default {
   components: {
     ButtonPrime,
     Calendar,
+    Checkbox,
     InputText,
     SelectButton
   },
@@ -225,7 +237,8 @@ export default {
       end: yup.date().required(),
       fio: yup.string(),
       company: yup.string(),
-      city: yup.string()
+      city: yup.string(),
+      is_votable: yup.boolean()
     })
     const { form, errors, handleSubmit, meta } = getForm({
       items: [
@@ -250,8 +263,7 @@ export default {
             fio: '',
             company: '',
             city: '',
-            section_name: 'qwe',
-            section_id: 0
+            is_votable: true
           }
         ]
       },
@@ -284,7 +296,8 @@ export default {
         end: null,
         fio: '',
         company: '',
-        city: ''
+        city: '',
+        is_votable: true
       })
     }
     const removeLecture = async (index, id) => {
@@ -339,6 +352,7 @@ export default {
     return {
       appendLecture,
       calendarPt,
+      checkboxPt,
       errors,
       form,
       inputPt,
