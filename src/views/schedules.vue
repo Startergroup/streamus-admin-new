@@ -5,14 +5,19 @@
         Расписания
       </h2>
 
-      <router-link :to="{ name: 'schedule-create' }">
-        <template #default>
-          <button-prime
-            label="Добавить расписание"
-            @click="() => {}"
-          />
-        </template>
-      </router-link>
+      <div class="tw-flex tw-items-center tw-gap-3">
+        <router-link :to="{ name: 'schedule-create' }">
+          <template #default>
+            <button-prime label="Добавить расписание" />
+          </template>
+        </router-link>
+
+        <button-prime
+          label="Отчет по голосованиям"
+          outlined
+          @click="openGenerateReportModal"
+        />
+      </div>
     </div>
 
     <data-table
@@ -46,12 +51,6 @@
             v-else-if="field === 'actions'"
             class="tw-flex tw-items tw-justify-end tw-w-full tw-gap-3"
           >
-            <button-prime
-              label="Отчет по голосованию"
-              outlined
-              @click="onGenerateVoteReport(data.schedule_id)"
-            />
-
             <router-link :to="{ name: 'schedule-edit', params: { id: data.schedule_id } }">
               <template #default>
                 <button-prime
@@ -79,18 +78,22 @@
 import ButtonPrime from 'primevue/button'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
+import GenerateVoteReport from '@/modals/generate-vote-report.vue'
 
+import GenerateXlsx from '@/utils/generate-xlsx'
 import moment from 'moment'
 import { tablePt } from '@/pt-options'
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { useModal } from 'vue-final-modal'
 
 export default {
   name: 'schedule',
   components: {
     ButtonPrime,
     Column,
-    DataTable
+    DataTable,
+    GenerateVoteReport
   },
   setup () {
     const store = useStore()
@@ -116,11 +119,35 @@ export default {
       await store.dispatch('schedule/getVoteReport', scheduleId)
     }
 
+    const { open: openGenerateReportModal } = useModal({
+      component: GenerateVoteReport,
+      attrs: {
+        onGenerateReport: async (date) => {
+          const [start, end] = date
+
+          const { votes = [] } = await store.dispatch('schedule/getVoteReport', { start, end }) || {}
+
+          const columns = [
+            { header: 'Название доклада', key: 'name' },
+            { header: 'Докладчик', key: 'fio' },
+            { header: 'Компания', key: 'company' },
+            { header: 'Количество голосов', key: 'votes' }
+          ]
+          const xlsx = new GenerateXlsx(columns, votes)
+          const sheet = xlsx.createSimpleSheet()
+          const filename = xlsx.createFilename('Отчет по голосованиям')
+
+          await xlsx.generateXlsx(filename, 'Отчет по голосованиям', sheet)
+        }
+      }
+    })
+
     return {
       columns,
       moment,
       onDelete,
       onGenerateVoteReport,
+      openGenerateReportModal,
       schedules,
       tablePt
     }

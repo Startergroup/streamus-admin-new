@@ -292,8 +292,8 @@ export default {
     const appendLecture = () => {
       form.value.lectures.value.push({
         name: '',
-        start: null,
-        end: null,
+        start: new Date(),
+        end: new Date(),
         fio: '',
         company: '',
         city: '',

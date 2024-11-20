@@ -48,10 +48,8 @@ export default {
       const { schedules = [] } = await Api.get(`${API_VERSION}/schedules`) || {}
       state.schedules = schedules
     },
-    async getVoteReport ({ state }, id) {
-      await Api.get(`${API_VERSION}/vote/report`, {
-        schedule_id: id
-      })
+    async getVoteReport ({ state }, { start, end }) {
+      return await Api.get(`${API_VERSION}/vote/report`, { start, end })
     },
     async updateSchedule ({ state }, { schedule_id = null, date = null, section: { section_name, section_id, }, lectures = null }) {
       await Api.put(`${API_VERSION}/schedule`, {
