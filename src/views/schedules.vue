@@ -86,6 +86,7 @@ import { tablePt } from '@/pt-options'
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useModal } from 'vue-final-modal'
+import dayjs from 'dayjs'
 
 export default {
   name: 'schedule',
@@ -98,7 +99,10 @@ export default {
   setup () {
     const store = useStore()
 
-    const schedules = computed(() => store.state.schedule.schedules)
+    const schedules = computed(() =>
+      store.state.schedule.schedules
+        .sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix())
+    )
     const columns = [
       { field: 'schedule_id', header: 'ID' },
       { field: 'date', header: 'Дата' },
