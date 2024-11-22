@@ -340,22 +340,24 @@ export default {
         await store.dispatch('schedule/getScheduleById', route.params.id)
 
         form.value.date.value = schedule.value.date
-        form.value.lectures.value = schedule.value.lectures.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
+        // form.value.lectures.value = schedule.value.lectures.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
         form.value.section.value = {
           section_id: schedule.value.section_id,
           section_name: schedule.value.section_name
         }
 
-        form.value.lectures.value = schedule.value.lectures.map(item => {
-          const year = dayjs(schedule.value.date).get('year')
-          const month = dayjs(schedule.value.date).get('month')
-          const date = dayjs(schedule.value.date).get('date')
+        form.value.lectures.value = schedule.value.lectures
+          .map(item => {
+            const year = dayjs(schedule.value.date).get('year')
+            const month = dayjs(schedule.value.date).get('month')
+            const date = dayjs(schedule.value.date).get('date')
 
-          item.start = dayjs(item.start).set('year', year).set('month', month).set('date', date)
-          item.end = dayjs(item.end).set('year', year).set('month', month).set('date', date)
+            item.start = dayjs(item.start).set('year', year).set('month', month).set('date', date)
+            item.end = dayjs(item.end).set('year', year).set('month', month).set('date', date)
 
-          return item
-        })
+            return item
+          })
+          .sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
       }
 
       await store.dispatch('tabs/getTabs')
