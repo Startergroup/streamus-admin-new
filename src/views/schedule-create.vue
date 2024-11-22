@@ -204,9 +204,9 @@ import InputText from 'primevue/inputtext'
 import SelectButton from 'primevue/selectbutton'
 
 import * as yup from 'yup'
+import dayjs from 'dayjs'
 import moment from 'moment'
 import momentTimezone from 'moment-timezone'
-import dayjs from 'dayjs'
 import { checkboxPt, inputPt } from '@/pt-options'
 import { getForm } from '@/composables/form.composables'
 import { useStore } from 'vuex'
@@ -340,7 +340,7 @@ export default {
         await store.dispatch('schedule/getScheduleById', route.params.id)
 
         form.value.date.value = schedule.value.date
-        // form.value.lectures.value = schedule.value.lectures
+        form.value.lectures.value = schedule.value.lectures.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
         form.value.section.value = {
           section_id: schedule.value.section_id,
           section_name: schedule.value.section_name
