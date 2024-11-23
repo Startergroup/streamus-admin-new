@@ -51,6 +51,12 @@
             v-else-if="field === 'actions'"
             class="tw-flex tw-items tw-justify-end tw-w-full tw-gap-3"
           >
+            <button-prime
+              outlined
+              label="Выгрузить отчет"
+              @click="onGenerateReportBySection(data.schedule_id, data.section_name)"
+            />
+
             <router-link :to="{ name: 'schedule-edit', params: { id: data.schedule_id } }">
               <template #default>
                 <button-prime
@@ -115,6 +121,19 @@ export default {
       await store.dispatch('schedule/getSchedules')
     })
 
+    const generateReport = async (items, name) => {
+      const columns = [
+        { header: 'Название доклада', key: 'name' },
+        { header: 'Докладчик', key: 'fio' },
+        { header: 'Компания', key: 'company' },
+        { header: 'Количество голосов', key: 'votes' }
+      ]
+      const xlsx = new GenerateXlsx(columns, items)
+      const sheet = xlsx.createSimpleSheet()
+      const filename = xlsx.createFilename(name)
+
+      await xlsx.generateXlsx(filename, name, sheet)
+    }
     const onDelete = async (id) => {
       await store.dispatch('schedule/deleteSchedule', id)
       await store.dispatch('schedule/getSchedules')
@@ -122,26 +141,20 @@ export default {
     const onGenerateVoteReport = async (scheduleId) => {
       await store.dispatch('schedule/getVoteReport', scheduleId)
     }
+    const onGenerateReportBySection = async (id, sectionName = '') => {
+      const { votes = [] } = await store.dispatch('schedule/getVoteReportBySection', id) || {}
+      const sortedVotes = votes.sort((a, b) => a.votes - b.votes)
+      await generateReport(sortedVotes, `Отчет по секции ${sectionName}`)
+    }
 
     const { open: openGenerateReportModal } = useModal({
       component: GenerateVoteReport,
       attrs: {
         onGenerateReport: async (date) => {
           const [start, end] = date
-
           const { votes = [] } = await store.dispatch('schedule/getVoteReport', { start, end }) || {}
 
-          const columns = [
-            { header: 'Название доклада', key: 'name' },
-            { header: 'Докладчик', key: 'fio' },
-            { header: 'Компания', key: 'company' },
-            { header: 'Количество голосов', key: 'votes' }
-          ]
-          const xlsx = new GenerateXlsx(columns, votes)
-          const sheet = xlsx.createSimpleSheet()
-          const filename = xlsx.createFilename('Отчет по голосованиям')
-
-          await xlsx.generateXlsx(filename, 'Отчет по голосованиям', sheet)
+          await generateReport(votes, 'Отчет по голосованиям')
         }
       }
     })
@@ -150,6 +163,7 @@ export default {
       columns,
       moment,
       onDelete,
+      onGenerateReportBySection,
       onGenerateVoteReport,
       openGenerateReportModal,
       schedules,

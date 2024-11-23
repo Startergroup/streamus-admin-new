@@ -51,6 +51,9 @@ export default {
     async getVoteReport ({ state }, { start, end }) {
       return await Api.get(`${API_VERSION}/vote/report`, { start, end })
     },
+    async getVoteReportBySection ({ state }, id) {
+      return await Api.get(`${API_VERSION}/vote/report-by-section`, { id })
+    },
     async updateSchedule ({ state }, { schedule_id = null, date = null, section: { section_name, section_id, }, lectures = null }) {
       await Api.put(`${API_VERSION}/schedule`, {
         data: {
