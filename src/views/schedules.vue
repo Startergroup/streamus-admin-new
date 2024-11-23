@@ -143,7 +143,7 @@ export default {
     }
     const onGenerateReportBySection = async (id, sectionName = '') => {
       const { votes = [] } = await store.dispatch('schedule/getVoteReportBySection', id) || {}
-      const sortedVotes = votes.sort((a, b) => a.votes - b.votes)
+      const sortedVotes = votes.sort((a, b) => b.votes - a.votes)
       await generateReport(sortedVotes, `Отчет по секции ${sectionName}`)
     }
 
