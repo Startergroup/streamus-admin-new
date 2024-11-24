@@ -1,7 +1,6 @@
 import Api from '@/api/api'
 import bcrypt from 'bcryptjs'
 import { AUTH_DATA } from '@/constants/storages'
-import { API_VERSION } from '@/api/api.config'
 
 export default {
   namespaced: true,
@@ -22,10 +21,10 @@ export default {
   },
   actions: {
     async checkToken () {
-      return await Api.get(`${API_VERSION}/admin/check_token`)
+      return await Api.get('v2/admin/check_token')
     },
     async login ({ state, commit }, { username, password }) {
-      const { data: { salt } } = await Api.post(`${API_VERSION}/admin/check_user`, {
+      const { salt } = await Api.post('v2/admin/check_user', {
         data: {
           login: username
         }
@@ -36,7 +35,7 @@ export default {
       }
 
       const passHash = bcrypt.hashSync(password, salt)
-      const { accessToken = null, success = false } = await Api.post(`${API_VERSION}/admin/login`, {
+      const { accessToken = null, success = false } = await Api.post('v2/admin/auth', {
         data: {
           login: username,
           pass: passHash
