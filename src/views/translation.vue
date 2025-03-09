@@ -49,39 +49,67 @@
 
     <!-- Блок с настройками -->
     <!-- TODO: Вынести в отдельный компонент вместе с логикой -->
-    <form
-      class="tw-column-start tw-w-full tw-gap-8"
-      @submit.prevent="onSubmit"
-    >
-      <div class="tw-flex tw-justify-between tw-items-center tw-w-full">
-        <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">Настройки</h2>
+    <div class="tw-column-start tw-w-full tw-gap-8">
+      <form
+        class="tw-column-start tw-w-full tw-gap-8"
+        @submit.prevent="onSubmit"
+      >
+        <div class="tw-flex tw-justify-between tw-items-center tw-w-full">
+          <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">Настройки</h2>
 
-        <button-prime
-          type="submit"
-          label="Сохранить"
-          @click="() => {}"
-        />
-      </div>
-
-      <div class="tw-grid tw-grid-cols-2 tw-w-full tw-gap-x-4 tw-gap-y-8">
-        <div
-          v-for="(item, index) in form"
-          :key="index"
-          class="tw-column-start tw-w-full tw-gap-2"
-        >
-          <span>{{ item.props.label }}</span>
-
-          <input-text
-            v-if="item.props.component === componentTypes.INPUT_TEXT"
-            v-model="item.value"
-            :placeholder="item.props.placeholder"
-            :invalid="Object.hasOwn(errors, item.name)"
-            :pt="inputPt"
-            class="tw-bg-ink/darker tw-w-full"
+          <button-prime
+            type="submit"
+            label="Сохранить"
           />
         </div>
+
+        <div class="tw-grid tw-grid-cols-2 tw-w-full tw-gap-x-4 tw-gap-y-8">
+          <div
+            v-for="(item, index) in form"
+            :key="index"
+            class="tw-column-start tw-w-full tw-gap-2"
+          >
+            <span>{{ item.props.label }}</span>
+
+            <input-text
+              v-if="item.props.component === componentTypes.INPUT_TEXT"
+              v-model="item.value"
+              :placeholder="item.props.placeholder"
+              :invalid="Object.hasOwn(errors, item.name)"
+              :pt="inputPt"
+              class="tw-bg-ink/darker tw-w-full"
+            />
+          </div>
+        </div>
+      </form>
+
+      <div class="tw-column-start tw-w-full tw-gap-8">
+        <h3 class="tw-text-2xl tw-font-medium tw-text-sky/white">Favicon</h3>
+
+        <file-upload
+          :file="filename"
+          text="Загрузить"
+          @upload:file="onUploadFavicon"
+          @remove:file="onRemoveFavicon"
+        >
+          <template #button>
+            <div class="tw-flex tw-items-center tw-gap-2">
+              <icon-base
+                :icon="icons['fi-rr-cloud upload']"
+                :width="15"
+                :height="15"
+                :view-box-size="[15, 15]"
+                fill="#FFF"
+              />
+
+              <span class="tw-text-base tw-font-medium tw-text-sky/white">
+                Загрузить
+              </span>
+            </div>
+          </template>
+        </file-upload>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -91,18 +119,21 @@ import Column from 'primevue/column'
 import CreateTabModal from '@/modals/create-tab-modal.vue'
 import DataTable from 'primevue/datatable'
 import EditTabModal from '@/modals/edit-tab-modal.vue'
+import FileUpload from '@/components/file-upload.vue'
+import IconBase from '@/components/icon-base.vue'
 import InputText from 'primevue/inputtext'
-import FileUpload from 'primevue/fileupload'
 import Toast from '@/components/toast/toast-template.vue'
 
 import * as yup from 'yup'
 import componentTypes from '@/constants/component-types'
+import icons from '@/utils/icons'
 import { inputPt, tablePt } from '@/pt-options'
 import { useStore } from 'vuex'
 import { computed, onMounted } from 'vue'
 import { useModal } from 'vue-final-modal'
 import { getForm } from '@/composables/form.composables'
 import { useToast } from 'vue-toastification'
+import { isEmpty } from 'lodash'
 
 export default {
   name: 'translation',
@@ -111,6 +142,7 @@ export default {
     Column,
     DataTable,
     FileUpload,
+    IconBase,
     InputText
   },
   setup () {
@@ -118,6 +150,12 @@ export default {
     const toast = useToast()
 
     const settings = computed(() => store.state.settings.settings)
+    const filename = computed(() => {
+      if (isEmpty(settings.value)) return ''
+      if (isEmpty(settings.value?.favicon)) return ''
+
+      return settings.value?.favicon.split('/').at(-1)
+    })
 
     const tabs = computed(() => store.state.tabs.tabs.sort((a, b) => a.order - b.order))
     const columns = [
@@ -243,15 +281,36 @@ export default {
       form.value.subtitle_en.value = settings.value?.subtitle_en
     })
 
+    const onRemoveFavicon = async () => {
+      await store.dispatch('settings/updateSettings', {
+        ...settings.value,
+        favicon: ''
+      })
+    }
+    const onUploadFavicon = async (file) => {
+      const { path, success } = await store.dispatch('uploadFile', file) || {}
+
+      if (success) {
+        await store.dispatch('settings/updateSettings', {
+          ...settings.value,
+          favicon: path
+        })
+      }
+    }
+
     return {
       columns,
       componentTypes,
       errors,
+      filename,
       form,
+      icons,
       inputPt,
       onEditTab,
       onRemoveTab,
       onSubmit,
+      onRemoveFavicon,
+      onUploadFavicon,
       openCreateTabModal,
       tablePt,
       tabs
