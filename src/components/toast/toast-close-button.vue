@@ -5,6 +5,10 @@
       :width="10"
       :height="10"
       :view-box-size="[12, 12]"
+      stroke="#FFF"
+      stroke-width="1.66667"
+      stroke-linejoin="round"
+      stroke-linecap="round"
     />
   </div>
 </template>

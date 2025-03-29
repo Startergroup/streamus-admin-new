@@ -9,7 +9,7 @@
     "plugin:vue/vue3-recommended",
     "standard"
   ],
-  "ignorePatterns": ["**/vendor/*.js"],
+  "ignorePatterns": ["**/vendor/*.js", "**/cypress/**/*.js"],
   "rules": {
     "no-console": ["warn", {
       "allow": ["error", "warn"]
@@ -76,6 +76,8 @@
     "vue/no-empty-component-block": "error",
     "vue/no-multi-spaces": ["error", {
       "ignoreProperties": false
-    }]
+    }],
+    // Отключаем правило из стиля standard, которое запрещает snake_case
+    "camelcase": ["off"]
   }
 }

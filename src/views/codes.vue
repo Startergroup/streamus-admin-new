@@ -28,7 +28,7 @@
           <button-prime
             :loading="isPendingDeleteCodes"
             label="Удалить все ключи"
-            class="tw-bg-red-400"
+            class="tw-bg-red-500 tw-text-white"
             @click="onRemoveAllCodes"
           />
         </div>

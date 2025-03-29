@@ -9,7 +9,7 @@ export const checkboxPt = {
     }
   }
 }
-export const inputPt =  {
+export const inputPt = {
   root: ({ props }) => {
     return {
       class: [

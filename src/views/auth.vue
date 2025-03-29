@@ -60,8 +60,7 @@ export default {
   name: 'auth',
   components: {
     ButtonPrime,
-    InputText,
-    Toast
+    InputText
   },
   setup () {
     const store = useStore()

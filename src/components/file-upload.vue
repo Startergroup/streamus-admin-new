@@ -6,9 +6,9 @@
       @change="onUploadFile"
     >
 
-    <span class="p-button p-component">
+    <span class="p-button p-component tw-max-h-9">
       <slot name="button">
-        <span class="tw-text-base tw-font-medium tw-text-sky/white">
+        <span class="tw-text-base tw-font-medium tw-text-ink/darker">
           {{ text }}
         </span>
       </slot>
@@ -17,9 +17,9 @@
 
   <div
     v-else
-    class="tw-flex tw-items-center tw-gap-3 p-button p-component"
+    class="tw-flex tw-items-center tw-gap-3 p-button p-component tw-max-h-9"
   >
-    <span class="tw-text-base tw-font-medium tw-text-sky/white">
+    <span class="tw-text-base tw-font-medium tw-text-ink/darker">
       {{ filename }}
     </span>
 
@@ -28,13 +28,16 @@
       :width="14"
       :height="14"
       :view-box-size="[12, 12]"
+      stroke="#202325"
+      stroke-width="1.66667"
+      stroke-linejoin="round"
+      stroke-linecap="round"
       @click="onRemoveFile"
     />
   </div>
 </template>
 
 <script>
-import ButtonPrime from 'primevue/button'
 import IconBase from '@/components/icon-base.vue'
 
 import icons from '@/utils/icons'
@@ -44,7 +47,6 @@ import { isEmpty } from 'lodash'
 export default {
   name: 'file-upload',
   components: {
-    ButtonPrime,
     IconBase
   },
   props: {

@@ -133,7 +133,7 @@ import { computed, onMounted } from 'vue'
 import { useModal } from 'vue-final-modal'
 import { getForm } from '@/composables/form.composables'
 import { useToast } from 'vue-toastification'
-import { isEmpty } from 'lodash'
+import { isEmpty, cloneDeep } from 'lodash'
 
 export default {
   name: 'translation',
@@ -157,7 +157,10 @@ export default {
       return settings.value?.favicon.split('/').at(-1)
     })
 
-    const tabs = computed(() => store.state.tabs.tabs.sort((a, b) => a.order - b.order))
+    const tabs = computed(() => {
+      const copyOfTabs = cloneDeep(store.state?.tabs?.tabs || [])
+      return copyOfTabs.sort((a, b) => a.order - b.order)
+    })
     const columns = [
       { field: 'tab_id', header: 'ID' },
       { field: 'name', header: 'Имя' },
@@ -165,7 +168,7 @@ export default {
       { field: 'order', header: 'Порядок' },
       { field: 'actions', header: '' }
     ]
-    const { open:openCreateTabModal } = useModal({
+    const { open: openCreateTabModal } = useModal({
       component: CreateTabModal,
       attrs: {
         onCreateTab: async ({ name, url, order }) => {
@@ -288,7 +291,7 @@ export default {
       })
     }
     const onUploadFavicon = async (file) => {
-      const { path, success } = await store.dispatch('uploadFile', file) || {}
+      const { path, success } = await store.dispatch('common/uploadFile', file) || {}
 
       if (success) {
         await store.dispatch('settings/updateSettings', {

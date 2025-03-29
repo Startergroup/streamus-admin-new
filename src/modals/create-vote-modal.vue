@@ -90,6 +90,10 @@
           :width="10"
           :height="10"
           :view-box-size="[12, 12]"
+          stroke="#FFF"
+          stroke-width="1.66667"
+          stroke-linejoin="round"
+          stroke-linecap="round"
           classes="tw-h-4 tw-w-4 dark:[&_path]:tw-stroke-white"
         />
       </div>
