@@ -4,12 +4,28 @@ import { API_VERSION } from '@/api/api.config'
 export default {
   namespaced: true,
   state: {
+    /**
+     * @param {{
+     *    date: Date,
+     *    lectures: {
+     *      city: string,
+     *      company: string,
+     *      end: Date,
+     *      fio: string,
+     *      is_votable: boolean,
+     *      name: string,
+     *      start: Date
+     *    }[],
+     *    section_id: number,
+     *    section_name: string
+     *  }}
+     */
     schedule: {},
     schedules: [],
     votes: []
   },
   actions: {
-    async createSchedule ({ state }, { date = null, section: { section_name, section_id, }, lectures = [] }) {
+    async createSchedule ({ state }, { date = null, section: { section_name, section_id }, lectures = [] }) {
       if (!(date && lectures.length)) {
         return
       }
@@ -54,7 +70,18 @@ export default {
     async getVoteReportBySection ({ state }, id) {
       return await Api.get(`${API_VERSION}/vote/report-by-section`, { id })
     },
-    async updateSchedule ({ state }, { schedule_id = null, date = null, section: { section_name, section_id, }, lectures = null }) {
+    async importSchedule ({ _state }, path) {
+      try {
+        await Api.post(`${API_VERSION}/schedule/import`, {
+          data: {
+            path
+          }
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async updateSchedule ({ state }, { schedule_id = null, date = null, section: { section_name, section_id }, lectures = null }) {
       await Api.put(`${API_VERSION}/schedule`, {
         data: {
           schedule_id,
