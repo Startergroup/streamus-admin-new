@@ -62,7 +62,9 @@
 
       <div class="tw-column-start tw-w-full tw-gap-6">
         <div class="tw-flex tw-items-center tw-justify-between tw-w-full">
-          <h2 class="tw-text-xl tw-font-medium tw-text-sky/white">Доклады</h2>
+          <h2 class="tw-text-xl tw-font-medium tw-text-sky/white">
+            Доклады
+          </h2>
 
           <button-prime
             outlined
@@ -205,13 +207,17 @@ import SelectButton from 'primevue/selectbutton'
 
 import * as yup from 'yup'
 import dayjs from 'dayjs'
-import moment from 'moment'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 import momentTimezone from 'moment-timezone'
 import { checkboxPt, inputPt } from '@/pt-options'
 import { getForm } from '@/composables/form.composables'
 import { useStore } from 'vuex'
 import { computed, onBeforeMount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 export default {
   name: 'schedule-create',
@@ -278,13 +284,26 @@ export default {
       })
     })
     const onSubmit = handleSubmit(async (values) => {
+      const date = dayjs(values.date).tz('Europe/Moscow').valueOf()
+      const lectures = values.lectures.map(item => ({
+        ...item,
+        start: dayjs(item.start).tz('Europe/Moscow').valueOf(),
+        end: dayjs(item.end).tz('Europe/Moscow').valueOf()
+      }))
+
       if (isEditMode.value) {
         await store.dispatch('schedule/updateSchedule', {
           ...values,
-          schedule_id: route.params.id
+          schedule_id: route.params.id,
+          date,
+          lectures
         })
       } else {
-        await store.dispatch('schedule/createSchedule', values)
+        await store.dispatch('schedule/createSchedule', {
+          ...values,
+          date,
+          lectures
+        })
       }
 
       await router.push({ name: 'schedules' })
@@ -339,13 +358,11 @@ export default {
       if (isEditMode.value) {
         await store.dispatch('schedule/getScheduleById', route.params.id)
 
-        form.value.date.value = schedule.value.date
-        // form.value.lectures.value = schedule.value.lectures.sort((a, b) => dayjs(a.start).unix() - dayjs(b.start).unix())
+        form.value.date.value = new Date(dayjs(schedule.value.date).valueOf())
         form.value.section.value = {
           section_id: schedule.value.section_id,
           section_name: schedule.value.section_name
         }
-
         form.value.lectures.value = schedule.value.lectures
           .map(item => {
             const year = dayjs(schedule.value.date).get('year')
@@ -372,7 +389,6 @@ export default {
       inputPt,
       isEditMode,
       meta,
-      moment,
       onSubmit,
       onUpdateDate,
       onUpdateTime,

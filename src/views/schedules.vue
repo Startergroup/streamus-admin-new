@@ -12,10 +12,21 @@
           </template>
         </router-link>
 
-        <button-prime
-          label="TEST"
-          @click="onUploadSchedule"
-        />
+        <button-prime class="tw-p-0">
+          <template #default>
+            <label class="tw-w-full tw-px-4 tw-py-2 tw-cursor-pointer">
+              <span>
+                Импортировать расписание
+              </span>
+
+              <input
+                type="file"
+                class="tw-hidden"
+                @change="onUploadSchedule"
+              >
+            </label>
+          </template>
+        </button-prime>
 
         <a
           href="/Шаблон_расписания.xlsx"
@@ -50,7 +61,7 @@
             </span>
 
             <span v-else-if="field === 'date'">
-              {{ moment(data[field]).format('DD.MM.YYYY') }}
+              {{ dayjs(data[field]).format('DD.MM.YYYY') }}
             </span>
 
             <span v-else-if="field === 'lectures'">
@@ -105,15 +116,16 @@ import ButtonPrime from 'primevue/button'
 import Column from 'primevue/column'
 import DataTable from 'primevue/datatable'
 import GenerateVoteReport from '@/modals/generate-vote-report.vue'
+import Toast from '@/components/toast/toast-template.vue'
 
 import GenerateXlsx from '@/utils/generate-xlsx'
 import dayjs from 'dayjs'
-import moment from 'moment'
 import { tablePt } from '@/pt-options'
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useModal } from 'vue-final-modal'
 import { cloneDeep } from 'lodash'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'schedules',
@@ -124,6 +136,7 @@ export default {
   },
   setup () {
     const store = useStore()
+    const toast = useToast()
 
     const schedules = computed(() => {
       return cloneDeep(store.state.schedule?.schedules || []).sort((a, b) => dayjs(a.date).unix() - dayjs(b.date).unix())
@@ -168,10 +181,30 @@ export default {
 
     const onUploadSchedule = async ({ target }) => {
       try {
-        // const { path } = await store.dispatch('common/uploadFile', target.files[0])
-        await store.dispatch('schedule/importSchedule')
+        const { path } = await store.dispatch('common/uploadFile', target.files[0])
+        const { success } = await store.dispatch('schedule/importSchedule', path)
+
+        await store.dispatch('schedule/getSchedules')
+
+        toast({
+          component: Toast,
+          props: {
+            title: success ? 'Успешно' : 'Ошибка',
+            message: success ? 'Расписание импортировано' : 'Ошибка при импорте расписания'
+          }
+        }, {
+          timeout: 5000
+        })
       } catch (error) {
-        console.error(error)
+        toast({
+          component: Toast,
+          props: {
+            title: 'Ошибка',
+            message: 'Непредвиденная ошибка'
+          }
+        }, {
+          timeout: 5000
+        })
       }
     }
 
@@ -188,8 +221,8 @@ export default {
     })
 
     return {
+      dayjs,
       columns,
-      moment,
       onDelete,
       onGenerateReportBySection,
       onGenerateVoteReport,

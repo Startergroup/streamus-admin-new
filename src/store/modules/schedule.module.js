@@ -72,7 +72,7 @@ export default {
     },
     async importSchedule ({ _state }, path) {
       try {
-        await Api.post(`${API_VERSION}/schedule/import`, {
+        return await Api.post(`${API_VERSION}/schedule/import`, {
           data: {
             path
           }
