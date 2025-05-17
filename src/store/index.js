@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 
+import analytics from './modules/analytics.module'
 import auth from './modules/auth.module'
 import codes from './modules/codes.module'
 import common from './modules/common.module'
@@ -10,6 +11,7 @@ import tabs from './modules/tabs.module'
 
 export default createStore({
   modules: {
+    analytics,
     auth,
     codes,
     common,

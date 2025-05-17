@@ -6,10 +6,18 @@
       <div class="tw-flex tw-items-center tw-justify-between tw-w-full">
         <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">Секции</h2>
 
-        <button-prime
-          label="Добавить секцию"
-          @click="openCreateTabModal"
-        />
+        <div class="tw-flex tw-items-center tw-gap-3">
+          <button-prime
+            label="Скачать отчет о просмотрах"
+            outlined
+            @click="onDownloadAnalyticsReport"
+          />
+
+          <button-prime
+            label="Добавить секцию"
+            @click="openCreateTabModal"
+          />
+        </div>
       </div>
 
       <data-table
@@ -301,6 +309,8 @@ export default {
       }
     }
 
+    const onDownloadAnalyticsReport = async () => await store.dispatch('analytics/downloadAnalyticsById')
+
     return {
       columns,
       componentTypes,
@@ -309,6 +319,7 @@ export default {
       form,
       icons,
       inputPt,
+      onDownloadAnalyticsReport,
       onEditTab,
       onRemoveTab,
       onSubmit,
