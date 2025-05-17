@@ -158,7 +158,8 @@ export default {
         { header: 'Название доклада', key: 'name' },
         { header: 'Докладчик', key: 'fio' },
         { header: 'Компания', key: 'company' },
-        { header: 'Количество голосов', key: 'votes' }
+        { header: 'Количество голосов', key: 'votes' },
+        { header: 'Количество просмотров', key: 'views' }
       ]
       const xlsx = new GenerateXlsx(columns, items)
       const sheet = xlsx.createSimpleSheet()
