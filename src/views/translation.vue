@@ -4,7 +4,9 @@
     <!-- TODO: Вынести в отдельный компонент вместе с логикой -->
     <div class="tw-column-start tw-w-full tw-gap-8">
       <div class="tw-flex tw-items-center tw-justify-between tw-w-full">
-        <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">Секции</h2>
+        <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">
+          Секции
+        </h2>
 
         <div class="tw-flex tw-items-center tw-gap-3">
           <button-prime
@@ -32,7 +34,12 @@
           :header="item.header"
         >
           <template #body="{ data, field }">
-            <span v-if="field !== 'actions'">{{ data[field] }}</span>
+            <span
+              v-if="field !== 'actions'"
+              :class="[{ '!tw-block tw-max-w-[640px] tw-truncate': field === 'url' }]"
+            >
+              {{ data[field] }}
+            </span>
 
             <div
               v-else
