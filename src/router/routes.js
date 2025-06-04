@@ -1,10 +1,11 @@
-import auth from '@/views/auth.vue'
-import codes from '@/views/codes.vue'
-import quizzes from '@/views/list-quizzes/list-quizzes.vue'
-import createQuiz from '@/views/create-quiz/create-quiz.vue'
-import scheduleCreate from '@/views/schedule-create.vue'
-import schedules from '@/views/schedules.vue'
-import translation from '@/views/translation.vue'
+import Auth from '@/views/auth.vue'
+import Chats from '@/views/chats/chats.vue'
+import Codes from '@/views/codes.vue'
+import Quizzes from '@/views/list-quizzes/list-quizzes.vue'
+import CreateQuiz from '@/views/create-quiz/create-quiz.vue'
+import ScheduleCreate from '@/views/schedule-create.vue'
+import Schedules from '@/views/schedules.vue'
+import Translation from '@/views/translation.vue'
 
 export default [
   {
@@ -13,16 +14,24 @@ export default [
   },
   {
     name: 'auth',
-    component: auth,
+    component: Auth,
     path: '/auth',
     meta: {
       isProtected: false
     }
   },
   {
+    name: 'chats',
+    path: '/chats',
+    component: Chats,
+    meta: {
+      isProtected: true
+    }
+  },
+  {
     name: 'create-quiz',
     path: '/create-quiz',
-    component: createQuiz,
+    component: CreateQuiz,
     meta: {
       isProtected: true
     }
@@ -30,7 +39,7 @@ export default [
   {
     name: 'codes',
     path: '/codes',
-    component: codes,
+    component: Codes,
     meta: {
       isProtected: true
     }
@@ -38,14 +47,14 @@ export default [
   {
     name: 'edit-quiz',
     path: '/edit-quiz/:id',
-    component: createQuiz,
+    component: CreateQuiz,
     meta: {
       isProtected: true
     }
   },
   {
     name: 'quizzes',
-    component: quizzes,
+    component: Quizzes,
     path: '/quizzes',
     meta: {
       isProtected: true
@@ -54,7 +63,7 @@ export default [
   {
     name: 'schedule-create',
     path: '/schedule-create',
-    component: scheduleCreate,
+    component: ScheduleCreate,
     meta: {
       isProtected: true
     }
@@ -62,14 +71,14 @@ export default [
   {
     name: 'schedule-edit',
     path: '/schedule-edit/:id',
-    component: scheduleCreate,
+    component: ScheduleCreate,
     meta: {
       isProtected: true
     }
   },
   {
     name: 'schedules',
-    component: schedules,
+    component: Schedules,
     path: '/schedules',
     meta: {
       isProtected: true
@@ -77,7 +86,7 @@ export default [
   },
   {
     name: 'translation',
-    component: translation,
+    component: Translation,
     path: '/translation',
     meta: {
       isProtected: true

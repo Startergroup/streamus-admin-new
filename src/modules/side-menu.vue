@@ -56,6 +56,10 @@ export default {
       {
         text: 'Расписания',
         url: '/schedules'
+      },
+      {
+        text: 'Чаты',
+        url: '/chats'
       }
     ]
 

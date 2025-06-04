@@ -7,7 +7,7 @@ export default {
   namespaced: true,
   state: {
     token: null,
-    username: ''
+    user: null
   },
   getters: {
     isLogged (state) {
@@ -18,6 +18,9 @@ export default {
     setToken (state, token) {
       state.token = token
       localStorage.setItem(AUTH_DATA, token)
+    },
+    setUser (state, user) {
+      state.user = user
     }
   },
   actions: {
@@ -36,7 +39,7 @@ export default {
       }
 
       const passHash = bcrypt.hashSync(password, salt)
-      const { accessToken = null, success = false } = await Api.post(`${API_VERSION}/admin/login`, {
+      const { accessToken = null, success = false, user } = await Api.post(`${API_VERSION}/admin/login`, {
         data: {
           login: username,
           pass: passHash
@@ -48,6 +51,7 @@ export default {
       }
 
       commit('setToken', accessToken)
+      commit('setUser', user)
 
       return {
         success: true
