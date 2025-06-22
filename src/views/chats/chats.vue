@@ -35,7 +35,7 @@ import TabPanel from 'primevue/tabpanel'
 import WSClient from '@/classes/WSClient'
 import { API_VERSION, BASE_URL } from '@/api/api.config'
 import { useStore } from 'vuex'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 
 export default {
   name: 'chats',
@@ -105,6 +105,10 @@ export default {
 
         store.commit('chats/SET_CHAT_MESSAGES', data || [])
       })
+    })
+
+    onUnmounted(() => {
+      wsClient.disconnect()
     })
 
     return {
