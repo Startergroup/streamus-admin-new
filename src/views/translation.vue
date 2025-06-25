@@ -70,7 +70,9 @@
         @submit.prevent="onSubmit"
       >
         <div class="tw-flex tw-justify-between tw-items-center tw-w-full">
-          <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">Настройки</h2>
+          <h2 class="tw-text-2xl tw-font-medium tw-text-sky/white">
+            Настройки
+          </h2>
 
           <button-prime
             type="submit"
@@ -84,7 +86,9 @@
             :key="index"
             class="tw-column-start tw-w-full tw-gap-2"
           >
-            <span>{{ item.props.label }}</span>
+            <span>
+              {{ item.props.label }}
+            </span>
 
             <input-text
               v-if="item.props.component === componentTypes.INPUT_TEXT"
@@ -98,31 +102,64 @@
         </div>
       </form>
 
-      <div class="tw-column-start tw-w-full tw-gap-8">
-        <h3 class="tw-text-2xl tw-font-medium tw-text-sky/white">Favicon</h3>
+      <div class="tw-flex tw-items-start tw-w-auto tw-gap-12">
+        <div class="tw-column-start tw-w-auto tw-gap-4">
+          <h3 class="tw-text-xl tw-font-medium tw-text-sky/white">
+            Favicon
+          </h3>
 
-        <file-upload
-          :file="filename"
-          text="Загрузить"
-          @upload:file="onUploadFavicon"
-          @remove:file="onRemoveFavicon"
-        >
-          <template #button>
-            <div class="tw-flex tw-items-center tw-gap-2">
-              <icon-base
-                :icon="icons['fi-rr-cloud upload']"
-                :width="15"
-                :height="15"
-                :view-box-size="[15, 15]"
-                fill="#FFF"
-              />
+          <file-upload
+            :file="faviconName"
+            text="Загрузить"
+            @upload:file="onUploadFavicon"
+            @remove:file="onRemoveFavicon"
+          >
+            <template #button>
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <icon-base
+                  :icon="icons['fi-rr-cloud upload']"
+                  :width="15"
+                  :height="15"
+                  :view-box-size="[15, 15]"
+                  fill="#FFF"
+                />
 
-              <span class="tw-text-base tw-font-medium tw-text-sky/white">
-                Загрузить
-              </span>
-            </div>
-          </template>
-        </file-upload>
+                <span class="tw-text-base tw-font-medium tw-text-sky/white">
+                  Загрузить
+                </span>
+              </div>
+            </template>
+          </file-upload>
+        </div>
+
+        <div class="tw-column-start tw-w-auto tw-gap-4">
+          <h3 class="tw-text-xl tw-font-medium tw-text-sky/white">
+            Логотип на странице входа
+          </h3>
+
+          <file-upload
+            :file="logoName"
+            text="Загрузить"
+            @upload:file="onUploadLogo"
+            @remove:file="onRemoveLogo"
+          >
+            <template #button>
+              <div class="tw-flex tw-items-center tw-gap-2">
+                <icon-base
+                  :icon="icons['fi-rr-cloud upload']"
+                  :width="15"
+                  :height="15"
+                  :view-box-size="[15, 15]"
+                  fill="#FFF"
+                />
+
+                <span class="tw-text-base tw-font-medium tw-text-sky/white">
+                  Загрузить
+                </span>
+              </div>
+            </template>
+          </file-upload>
+        </div>
       </div>
     </div>
   </div>
@@ -165,11 +202,17 @@ export default {
     const toast = useToast()
 
     const settings = computed(() => store.state.settings.settings)
-    const filename = computed(() => {
+    const faviconName = computed(() => {
       if (isEmpty(settings.value)) return ''
       if (isEmpty(settings.value?.favicon)) return ''
 
       return settings.value?.favicon.split('/').at(-1)
+    })
+    const logoName = computed(() => {
+      if (isEmpty(settings.value)) return ''
+      if (isEmpty(settings.value?.logo)) return ''
+
+      return settings.value?.logo.split('/').at(-1)
     })
 
     const tabs = computed(() => {
@@ -263,7 +306,11 @@ export default {
     })
     const onSubmit = handleSubmit(async (values) => {
       try {
-        await store.dispatch('settings/updateSettings', values)
+        await store.dispatch('settings/updateSettings', {
+          ...values,
+          favicon: settings.value?.favicon,
+          logo: settings.value?.logo
+        })
 
         toast({
           component: Toast,
@@ -289,20 +336,16 @@ export default {
       }
     })
 
-    onMounted(async () => {
-      await store.dispatch('settings/getSettings')
-      await store.dispatch('tabs/getTabs')
-
-      form.value.title_ru.value = settings.value?.title_ru
-      form.value.subtitle_ru.value = settings.value?.subtitle_ru
-      form.value.title_en.value = settings.value?.title_en
-      form.value.subtitle_en.value = settings.value?.subtitle_en
-    })
-
     const onRemoveFavicon = async () => {
       await store.dispatch('settings/updateSettings', {
         ...settings.value,
         favicon: ''
+      })
+    }
+    const onRemoveLogo = async () => {
+      await store.dispatch('settings/updateSettings', {
+        ...settings.value,
+        logo: ''
       })
     }
     const onUploadFavicon = async (file) => {
@@ -315,23 +358,46 @@ export default {
         })
       }
     }
+    const onUploadLogo = async (file) => {
+      const { path, success } = await store.dispatch('common/uploadFile', file) || {}
+
+      if (success) {
+        await store.dispatch('settings/updateSettings', {
+          ...settings.value,
+          logo: path
+        })
+      }
+    }
 
     const onDownloadAnalyticsReport = async () => await store.dispatch('analytics/downloadAnalyticsById')
+
+    onMounted(async () => {
+      await store.dispatch('settings/getSettings')
+      await store.dispatch('tabs/getTabs')
+
+      form.value.title_ru.value = settings.value?.title_ru
+      form.value.subtitle_ru.value = settings.value?.subtitle_ru
+      form.value.title_en.value = settings.value?.title_en
+      form.value.subtitle_en.value = settings.value?.subtitle_en
+    })
 
     return {
       columns,
       componentTypes,
       errors,
-      filename,
+      faviconName,
       form,
       icons,
       inputPt,
+      logoName,
       onDownloadAnalyticsReport,
       onEditTab,
       onRemoveTab,
       onSubmit,
       onRemoveFavicon,
+      onRemoveLogo,
       onUploadFavicon,
+      onUploadLogo,
       openCreateTabModal,
       tablePt,
       tabs
